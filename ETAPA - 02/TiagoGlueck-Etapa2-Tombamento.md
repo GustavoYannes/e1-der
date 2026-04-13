@@ -1,11 +1,13 @@
-CREATE TABLE EXEMPLAR ( 
+![](TiagoGlueck-Etapa2-Tombamento.jpg)
+
+	CREATE TABLE EXEMPLAR ( 
 	ID_Tombo VARCHAR(20)   PRIMARY KEY, -- 🔑 PK
 	Tipo_Aquisicao VARCHAR(30),
 	Data_Aquisicao DATE,
     Valor_Compra DECIMAL(10,2), Status VARCHAR(20),
 	Conservacao VARCHAR(30) 
 	);
-CREATE TABLE LOCALIZACAO_FISICA ( 
+	CREATE TABLE LOCALIZACAO_FISICA ( 
 	ID_Tombo VARCHAR(20) PRIMARY KEY -- 🔑🔗 PK e FK 
 	REFERENCES EXEMPLAR(ID_Tombo),
 	Predio VARCHAR(50),
