@@ -1,0 +1,174 @@
+# Normalização da Tabela de Reservas
+
+## Tabela Inicial
+
+| ID_Reserva | Data_Reserva | Data_Validade | Status | ID_Usuario | Nome_Usuario | ID_Tombo | Nome_Exemplar |
+|------------|--------------|---------------|--------|------------|--------------|----------|---------------|
+
+---
+
+## 1. Dependências Funcionais
+
+### Dependência da reserva
+
+```
+ID_Reserva → Data_Reserva, Data_Validade, Status, ID_Usuario, ID_Tombo
+```
+
+Cada reserva possui seus próprios dados e referencia um usuário e um exemplar.
+
+### Dependência do usuário
+
+```
+ID_Usuario → Nome_Usuario
+```
+
+Um ID de usuário identifica unicamente o nome do usuário.
+
+### Dependência do exemplar
+
+```
+ID_Tombo → Nome_Exemplar
+```
+
+Cada exemplar possui um identificador único.
+
+---
+
+## 2. Verificação das Formas Normais
+
+### Primeira Forma Normal (1FN)
+
+Uma tabela está na 1FN quando:
+
+- Todos os atributos são atômicos;
+- Não existem grupos repetitivos;
+- Cada célula possui apenas um valor.
+
+**Verificação:** na tabela, todos os campos possuem valores simples, não existem listas ou múltiplos valores e não há repetição de grupos de atributos.
+
+> A tabela está em **1FN**.
+
+---
+
+### Segunda Forma Normal (2FN)
+
+Uma tabela está na 2FN quando está em 1FN e não possui dependências parciais.
+
+**Chave primária:**
+
+```
+ID_Reserva
+```
+
+Como a chave primária possui apenas um atributo, não existem dependências parciais. Todos os atributos dependem totalmente de `ID_Reserva`.
+
+> A tabela está em **2FN**.
+
+---
+
+### Terceira Forma Normal (3FN)
+
+Uma tabela está na 3FN quando está em 2FN e não possui dependências transitivas.
+
+**Verificação das dependências transitivas:**
+
+```
+ID_Reserva → ID_Usuario
+ID_Usuario → Nome_Usuario
+──────────────────────────
+ID_Reserva → Nome_Usuario  (dependência transitiva)
+```
+
+```
+ID_Reserva → ID_Tombo
+ID_Tombo   → Nome_Exemplar
+──────────────────────────
+ID_Reserva → Nome_Exemplar  (dependência transitiva)
+```
+
+> A tabela **não está em 3FN**, pois existem dependências transitivas.
+
+---
+
+## 3. Decomposição para 3FN
+
+### Tabela `USUARIO`
+
+| Campo           | Tipo |
+|-------          |------|
+| ID_Usuario `PK` | INT |
+| Nome_Usuario    | VARCHAR |
+
+```
+ID_Usuario → Nome_Usuario
+```
+
+---
+
+### Tabela `EXEMPLAR`
+
+| Campo | Tipo |
+|-------|------|
+| ID_Tombo `PK` | INT |
+| Nome_Exemplar | VARCHAR |
+
+```
+ID_Tombo → Nome_Exemplar
+```
+
+---
+
+### Tabela `RESERVA`
+
+| Campo | Tipo |
+|-------|------|
+| ID_Reserva `PK` | INT |
+| Data_Reserva | DATE |
+| Data_Validade | DATE |
+| Status | VARCHAR |
+| ID_Usuario `FK` | INT |
+| ID_Tombo `FK` | INT |
+
+```
+ID_Reserva → Data_Reserva, Data_Validade, Status, ID_Usuario, ID_Tombo
+```
+
+---
+
+## 4. Verificação da BCNF
+
+> Uma relação está na BCNF quando **todo determinante é uma chave candidata**.
+
+| Tabela | Determinante | É chave primária? | Satisfaz BCNF? |
+|--------|-------------|-------------------|----------------|
+| USUARIO | `ID_Usuario` | Sim | Sim |
+| EXEMPLAR | `ID_Tombo` | Sim | Sim |
+| RESERVA | `ID_Reserva` | Sim | Sim |
+
+---
+
+## Conclusão Final
+
+Após a decomposição, todas as tabelas satisfazem:
+
+- Primeira Forma Normal (1FN)
+- Segunda Forma Normal (2FN)
+- Terceira Forma Normal (3FN)
+- Forma Normal de Boyce-Codd (BCNF)
+
+---
+
+## Trade-off: Normalização × Performance
+
+| Aspecto | Normalização reduz | Normalização aumenta |
+|--------|-------------------|---------------------|
+| Dados | Redundância e inconsistência | Quantidade de tabelas |
+| Operações | Anomalias de atualização | Uso de JOINs |
+| Consultas | — | Custo em queries complexas |
+
+**No sistema de reservas:**
+
+- O ganho em integridade supera o custo de desempenho;
+- O volume de dados tende a ser moderado;
+- O uso de BCNF é adequado para manter consistência e organização.
