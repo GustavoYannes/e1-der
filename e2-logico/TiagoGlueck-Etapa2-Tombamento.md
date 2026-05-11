@@ -1,19 +1,25 @@
-![](TiagoGlueck-Etapa2-Tombamento.jpg)
+![](Exemplar.jpg)
 
-	CREATE TABLE EXEMPLAR ( 
-	ID_Tombo VARCHAR(20)   PRIMARY KEY, -- 🔑 PK
-	Tipo_Aquisicao VARCHAR(30),
-	Data_Aquisicao DATE,
-    Valor_Compra DECIMAL(10,2), Status VARCHAR(20),
-	Conservacao VARCHAR(30) 
+	CREATE TABLE LOCALIZACAO_FISICA (
+    id_localizacao VARCHAR(50) PRIMARY KEY,
+    endereco VARCHAR(50),
+    andar INTEGER,
+    estante VARCHAR(30)
 	);
-	CREATE TABLE LOCALIZACAO_FISICA ( 
-	ID_Tombo VARCHAR(20) PRIMARY KEY -- 🔑🔗 PK e FK 
-	REFERENCES EXEMPLAR(ID_Tombo),
-	Predio VARCHAR(50),
-	Andar INTEGER, Estante VARCHAR(30) 
+	
+	CREATE TABLE EXEMPLAR (
+    id_tombo VARCHAR(20) PRIMARY KEY,
+    tipo_aquisicao VARCHAR(30),
+    data_aquisicao DATE,
+    valor_compra DECIMAL(10,2),
+    status VARCHAR(20),
+    conservacao VARCHAR(30),
+    id_localizacao VARCHAR(50),
+
+    FOREIGN KEY (id_localizacao)
+        REFERENCES LOCALIZACAO_FISICA(id_localizacao)
 	);
 
-JUSTIFICATIVA: EXEMPLAR → LOCALIZACAO_FISICA (1:1 via ID_Tombo PK/FK) A localização foi separada em tabela própria para isolar o que é o bem (aquisição, estado) de onde ele está (prédio, andar, estante). 
-O padrão chave primaria ID_Tombo sendo PK e FK ao mesmo tempo — garante que toda localização tenha um exemplar correspondente e que cada exemplar tenha no máximo uma localização.
-Atributos de aquisição em EXEMPLAR Tipo_Aquisicao, Data_Aquisicao e Valor_Compra descrevem o evento de incorporação do bem, dependendo diretamente do tombo — por isso ficam na tabela principal. Status e Conservacao como VARCHAR simples Valores controlados pela aplicação nesta etapa, sem tabelas de domínio, reduzindo a complexidade inicial do esquema.
+Justificativa do relacionamento
+
+O relacionamento entre EXEMPLAR e LOCALIZACAO_FISICA foi modelado como N:1, onde vários exemplares podem compartilhar uma mesma localização física. Essa abordagem representa melhor o funcionamento real de uma biblioteca, já que diversos exemplares podem estar armazenados na mesma estante, corredor ou andar. Por esse motivo, a chave estrangeira id_localizacao foi inserida na tabela EXEMPLAR, indicando a localização associada a cada exemplar. A entidade LOCALIZACAO_FISICA foi mantida separada para evitar redundância de dados e facilitar futuras alterações ou reutilizações de locais cadastrados.
