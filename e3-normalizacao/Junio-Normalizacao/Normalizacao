@@ -2,8 +2,12 @@
 
 ## Tabela Inicial
 
+![Tabela Inicial](img/tabela-inicial.png)
+
 | ID_Reserva | Data_Reserva | Data_Validade | Status | ID_Usuario | Nome_Usuario | ID_Tombo | Nome_Exemplar |
 |------------|--------------|---------------|--------|------------|--------------|----------|---------------|
+
+
 
 ---
 
@@ -93,42 +97,7 @@ ID_Reserva → Nome_Exemplar  (dependência transitiva)
 
 ## 3. Decomposição para 3FN
 
-### Tabela `USUARIO`
-
-| Campo           | Tipo |
-|-------          |------|
-| ID_Usuario `PK` | INT |
-| Nome_Usuario    | VARCHAR |
-
-```
-ID_Usuario → Nome_Usuario
-```
-
----
-
-### Tabela `EXEMPLAR`
-
-| Campo | Tipo |
-|-------|------|
-| ID_Tombo `PK` | INT |
-| Nome_Exemplar | VARCHAR |
-
-```
-ID_Tombo → Nome_Exemplar
-```
-
----
-
-### Tabela `RESERVA`
-
-| Campo | Tipo |
-|-------|------|
-| ID_Reserva `PK` | INT |
-| Data_Reserva | DATE |
-| Data_Validade | DATE |
-| Status | VARCHAR |
-| ID_Usuario `FK` | INT |
-| ID_Tombo `FK` | INT |
+![Tabela Normalizada](img/tabela-normalizada.png)
 
 ```
 ID_Reserva → Data_Reserva, Data_Validade, Status, ID_Usuario, ID_Tombo
