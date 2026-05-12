@@ -160,7 +160,3 @@ FROM localizacao_fisica l
 LEFT JOIN exemplar e ON l.id_localizacao = e.id_localizacao
 GROUP BY l.andar
 ORDER BY total_exemplares DESC;
-
--- =============================================
--- FIM DO ARQUIVO e4-sql.sql
--- =============================================
