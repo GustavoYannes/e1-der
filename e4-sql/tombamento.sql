@@ -50,7 +50,7 @@ COMMENT ON COLUMN exemplar.conservacao IS 'Estado de conservação';
 -- B) DML - DADOS DE TESTE
 -- =============================================
 
--- Inserção de Localizações Físicas
+-- Criando Localizações Físicas
 INSERT INTO localizacao_fisica (id_localizacao, endereco, andar, estante) VALUES
 ('SALA101-A', 'Sala de Leitura - Ala A', 1, 'E1'),
 ('SALA101-B', 'Sala de Leitura - Ala B', 1, 'E3'),
@@ -61,7 +61,7 @@ INSERT INTO localizacao_fisica (id_localizacao, endereco, andar, estante) VALUES
 ('LIT01',     'Literatura Brasileira', 1, 'E4'),
 ('CIEN02',    'Ciências Exatas', 2, 'E7');
 
--- Inserção de Exemplares (12 registros)
+-- Criando Exemplares (12 registros)
 INSERT INTO exemplar (id_tombo, tipo_aquisicao, data_aquisicao, valor_compra, status, conservacao, id_localizacao) VALUES
 ('T2023001', 'Compra',  '2023-05-10',  89.90, 'DISPONIVEL',  'Bom',     'SALA101-A'),
 ('T2023002', 'Doação',  '2023-06-15',   0.00, 'EMPRESTADO',  'Ótimo',   'SALA101-B'),
@@ -80,19 +80,19 @@ INSERT INTO exemplar (id_tombo, tipo_aquisicao, data_aquisicao, valor_compra, st
 -- C) CONSULTAS SQL (Q1 a Q10)
 -- =============================================
 
--- Q1: Projeção e Seleção Simples
+-- Q1: Filtro de livros que custam mais de 100 reais
 SELECT id_tombo, tipo_aquisicao, valor_compra, status 
 FROM exemplar 
 WHERE valor_compra > 100 AND status = 'DISPONIVEL';
 
--- Q2: Seleção com operadores lógicos e LIKE
+-- Q2:Filtro de periodo e estado de conservação
 SELECT id_tombo, data_aquisicao, conservacao 
 FROM exemplar 
 WHERE tipo_aquisicao = 'Compra' 
   AND data_aquisicao BETWEEN '2024-01-01' AND '2024-06-30'
   AND conservacao IN ('Bom', 'Ótimo');
 
--- Q3: INNER JOIN (2 tabelas)
+-- Q3: Cruza as duas tabelas para mostrar o endereço real de onde esta cada exemplar emprestado
 SELECT 
     e.id_tombo,
     e.status,
@@ -103,7 +103,7 @@ FROM exemplar e
 INNER JOIN localizacao_fisica l ON e.id_localizacao = l.id_localizacao
 WHERE e.status = 'EMPRESTADO';
 
--- Q4: INNER JOIN + Agregação
+-- Q4: Estatistica por local (quantidade de exemplares no endereço)
 SELECT 
     l.endereco AS local,
     COUNT(e.id_tombo) AS qtd_exemplares,
@@ -113,7 +113,7 @@ INNER JOIN exemplar e ON l.id_localizacao = e.id_localizacao
 GROUP BY l.endereco
 ORDER BY qtd_exemplares DESC;
 
--- Q5: LEFT OUTER JOIN (exemplos sem correspondência)
+-- Q5: Filtra exemplos sem correspondência
 SELECT 
     e.id_tombo,
     e.status,
@@ -122,7 +122,7 @@ FROM exemplar e
 LEFT OUTER JOIN localizacao_fisica l ON e.id_localizacao = l.id_localizacao
 WHERE l.id_localizacao IS NULL;
 
--- Q6: RIGHT OUTER JOIN (localizações sem exemplares)
+-- Q6: Filtra localizações sem exemplares
 SELECT 
     l.endereco,
     e.id_tombo
@@ -130,12 +130,12 @@ FROM exemplar e
 RIGHT OUTER JOIN localizacao_fisica l ON e.id_localizacao = l.id_localizacao
 WHERE e.id_tombo IS NULL;
 
--- Q7: Subquery
+-- Q7: Calcula media de preço de toos os livros e depois lista os que estao acima da media
 SELECT id_tombo, valor_compra 
 FROM exemplar 
 WHERE valor_compra > (SELECT AVG(valor_compra) FROM exemplar);
 
--- Q8: GROUP BY + HAVING
+-- Q8: Filtra em grupo o maior valor e o menor valor (exibe so se exisitir 2 exemplares)
 SELECT 
     status,
     COUNT(*) AS quantidade,
@@ -145,13 +145,13 @@ FROM exemplar
 GROUP BY status
 HAVING COUNT(*) >= 2;
 
--- Q9: Consulta com ORDER BY e LIMIT
+-- Q9: Ordena os livros por vaor (mais caro para o mais barato)
 SELECT id_tombo, tipo_aquisicao, data_aquisicao, valor_compra
 FROM exemplar 
 ORDER BY valor_compra DESC 
 LIMIT 5;
 
--- Q10: Junção + Agregação + Filtro
+-- Q10: Faz um resumo por andar contado o total de livros (ate os que estao emprestados)
 SELECT 
     l.andar,
     COUNT(e.id_tombo) AS total_exemplares,
